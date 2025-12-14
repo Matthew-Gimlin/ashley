@@ -1,0 +1,26 @@
+#ifndef API_H
+#define API_H
+
+#include "ashley.h"
+#include "common.h"
+#include "token.h"
+#include "ast.h"
+
+struct ash_state_s {
+    const char* filename;
+    const char* src;
+
+    // lex state
+    unsigned begin;
+    unsigned end;
+    token_t token;
+
+    // parse state
+    ast_t* ast;
+
+    arena_t* arena;
+    table_t symbols;
+    table_t types;
+};
+
+#endif
