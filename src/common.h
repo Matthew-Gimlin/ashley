@@ -5,6 +5,8 @@
 #include <stdalign.h>
 #include <stdint.h>
 
+#define ASH_UNUSED(x) (void)(x)
+
 #ifdef __GNUC__
 #    define ASH_FALLTHROUGH() __attribute((fallthrough))
 #    define ASH_UNREACHABLE() __builtin_unreachable()

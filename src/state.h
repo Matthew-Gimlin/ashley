@@ -10,12 +10,12 @@ struct ash_state_s {
     const char* filename;
     const char* src;
 
-    // lex state
+    // lexer state
     unsigned begin;
     unsigned end;
     token_t token;
 
-    // parse state
+    // parser state
     ast_t* ast;
 
     arena_t* arena;

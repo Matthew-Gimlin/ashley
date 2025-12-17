@@ -1,2 +1,3 @@
 # ashley
-a statically-typed scripting language
+
+A statically-typed scripting language.

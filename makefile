@@ -1,12 +1,16 @@
 CC = cc
-CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Iinclude
+CFLAGS = -g -O0 -std=c11 -Wall -Wextra -Wpedantic -Iinclude
 
 APP = ashley
 APP_SRC = src/main.c
 APP_OBJ = $(APP_SRC:.c=.o)
 
 LIB = libashley.a
-LIB_SRC = src/api.c
+LIB_SRC = src/api.c \
+		  src/common.c \
+		  src/lex.c \
+		  src/parse.c \
+		  src/debug.c
 LIB_OBJ = $(LIB_SRC:.c=.o)
 
 .PHONY: all clean

@@ -8,6 +8,7 @@ typedef enum {
     AST_ERROR = 0,
     AST_INT,
     AST_FLOAT,
+    AST_IDENTIFIER,
     AST_CAST,
     AST_NEGATE,
     AST_ADD,
@@ -15,9 +16,23 @@ typedef enum {
     AST_MULTIPLY,
     AST_DIVIDE,
     AST_MODULO,
+    AST_SHIFT_LEFT,
+    AST_SHIFT_RIGHT,
+    AST_LESS,
+    AST_LESS_EQUAL,
+    AST_GREATER,
+    AST_GREATER_EQUAL,
+    AST_EQUAL,
+    AST_NOT_EQUAL,
     AST_BITWISE_AND,
-    AST_BITWISE_XOR,
     AST_BITWISE_OR,
+    AST_BITWISE_XOR,
+    AST_AND,
+    AST_OR,
+    AST_XOR,
+    AST_ASSIGN,
+    AST_EXPRESSION,
+    AST_BLOCK,
 } ast_node_t;
 
 typedef struct {
@@ -47,7 +62,7 @@ struct expression_s {
 struct statement_s {
     ast_t ast;
     union {
-        expression_t* expr;
+        expression_t* expression;
     } as;
     statement_t* next;
 };

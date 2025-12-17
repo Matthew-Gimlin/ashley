@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
 arena_t* arena_new(void) {
     arena_t* arena = malloc(sizeof(arena_t));
+    if (!arena) {
+        return NULL;
+    }
     memset(arena, 0, sizeof(arena_t));
     return arena;
 }
@@ -23,14 +27,16 @@ static inline size_t align(size_t n) {
 }
 
 void* arena_alloc(arena_t* arena, size_t n) {
-    ASH_ASSERT(n < ARENA_SIZE);
+    assert(n < ARENA_SIZE);
     if (arena == NULL || n == 0) {
         return NULL;
     }
     size_t i = align(arena->size);
     while (i + n > ARENA_SIZE) {
         if (arena->next == NULL) {
-            arena->next = arena_new();
+            if ((arena->next = arena_new()) == NULL) {
+                return NULL;
+            }
         }
         arena = arena->next;
         i = align(arena->size);
