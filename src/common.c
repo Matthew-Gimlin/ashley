@@ -86,7 +86,7 @@ static entry_t* table_find(entry_t* entries, size_t capacity, const char* key,
         }
         i = (i + 1) % capacity;
     }
-    ASH_UNREACHABLE();
+    UNREACHABLE();
 }
 
 static void table_resize(table_t* table, size_t new_capacity) {

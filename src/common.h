@@ -1,18 +1,18 @@
-#ifndef ASH_COMMON_H
-#define ASH_COMMON_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <stddef.h>
 #include <stdalign.h>
 #include <stdint.h>
 
-#define ASH_UNUSED(x) (void)(x)
+#define UNUSED(x) (void)(x)
 
 #ifdef __GNUC__
-#    define ASH_FALLTHROUGH() __attribute((fallthrough))
-#    define ASH_UNREACHABLE() __builtin_unreachable()
+#    define FALLTHROUGH() __attribute((fallthrough))
+#    define UNREACHABLE() __builtin_unreachable()
 #else
-#    define ASH_FALLTHROUGH() do {} while (0)
-#    define ASH_UNREACHABLE() do {} while (0)
+#    define FALLTHROUGH() do {} while (0)
+#    define UNREACHABLE() do {} while (0)
 #endif
 
 #define ARENA_SIZE 1024

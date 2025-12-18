@@ -3,7 +3,10 @@
 #include <stdio.h>
 
 void dump_ast(ash_state_t* a, ast_t* ast) {
-    if (!ast) return;
+    if (!ast) {
+        printf("<null>");
+        return;
+    }
     expression_t* e = (expression_t*)ast;
     switch (ast->node) {
         case AST_INT:

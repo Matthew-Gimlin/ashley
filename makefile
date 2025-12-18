@@ -10,6 +10,7 @@ LIB_SRC = src/api.c \
 		  src/common.c \
 		  src/lex.c \
 		  src/parse.c \
+		  src/analyze.c \
 		  src/debug.c
 LIB_OBJ = $(LIB_SRC:.c=.o)
 

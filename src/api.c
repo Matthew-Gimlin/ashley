@@ -2,6 +2,7 @@
 #include "type.h"
 #include "lex.h"
 #include "parse.h"
+#include "analyze.h"
 #include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ static void set_default_types(ash_state_t* a) {
 
 static void set_default_symbols(ash_state_t* a) {
     // TODO
-    ASH_UNUSED(a);
+    UNUSED(a);
 }
 
 ash_state_t* ash_state_new(void) {
@@ -46,6 +47,9 @@ static int do_string(ash_state_t* a, const char* filename, const char* string) {
         return 1;
     }
     if (parse(a) != 0) {
+        return 1;
+    }
+    if (analyze(a) != 0) {
         return 1;
     }
     dump_ast(a, a->ast);

@@ -241,7 +241,7 @@ int lex(ash_state_t* a) {
 
         case '#':
             skip_comment(a);
-            ASH_FALLTHROUGH();
+            FALLTHROUGH();
         case '\n':
             a->token = TOKEN_NEWLINE;
             a->end++;
@@ -308,6 +308,11 @@ int lex(ash_state_t* a) {
             a->token = accept(a, '=') ? accept_n(a, ">=", 2) ?
                 TOKEN_GREATER_GREATER_EQUAL : TOKEN_GREATER_EQUAL :
                 TOKEN_GREATER;
+            return 0;
+
+        case '=':
+            a->end++;
+            a->token = accept(a, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL;
             return 0;
 
         case '.':
