@@ -193,7 +193,9 @@ static token_t get_identifier_type(ash_state_t* a) {
     unsigned i = a->begin;
     switch (a->src[i++]) {
         case 'a':
-            if (is_keyword(a, i, "nd", 2)) {
+            if (is_keyword(a, i, "s", 1)) {
+                return TOKEN_AS;
+            } else if (is_keyword(a, i, "nd", 2)) {
                 return TOKEN_AND;
             }
             break;

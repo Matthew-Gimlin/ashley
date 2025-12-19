@@ -4,6 +4,7 @@
 typedef enum {
     TYPE_ERROR = 0,
     TYPE_BOOL,
+    TYPE_BYTE,
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_STRING,

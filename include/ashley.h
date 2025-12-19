@@ -11,6 +11,8 @@ extern "C" {
 #define ASH_VERSION_MINOR 1
 #define ASH_VERSION_PATCH 0
 
+typedef uint8_t ash_bool_t;
+typedef uint8_t ash_byte_t;
 typedef int64_t ash_int_t;
 typedef double ash_float_t;
 

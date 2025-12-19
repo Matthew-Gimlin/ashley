@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "debug.h"
-
 typedef expression_t* (*parse_expr_fn)(ash_state_t*);
 
 static expression_t* parse_expression(ash_state_t* a);
@@ -53,7 +51,6 @@ static expression_t* new_binary(ash_state_t* a, ast_node_t node,
     }
     if ((binary->as.binary.right = parse_right(a)) == NULL) {
         return NULL;
-        return NULL;
     }
     binary->ast.end = binary->as.binary.right->ast.end;
     return binary;
@@ -88,7 +85,7 @@ static expression_t* parse_atom(ash_state_t* a) {
         atom->as._int = strtol(&a->src[atom->ast.begin], NULL, 10);
         atom->ast.type = table_get(&a->types, "int", 3);
         return atom;
-    } else if (accept(a, TOKEN_FLOAT)) {
+    } else if (a->token == TOKEN_FLOAT) {
         expression_t* atom = new_atom(a, AST_FLOAT);
         atom->as._float = strtod(&a->src[atom->ast.begin], NULL);
         atom->ast.type = table_get(&a->types, "float", 5);
@@ -117,33 +114,33 @@ static expression_t* parse_unary(ash_state_t* a) {
 }
 
 static expression_t* parse_multiplicative(ash_state_t* a) {
-    expression_t* expr = parse_unary(a);
+    expression_t* e = parse_unary(a);
     while (true) {
         if (a->token == TOKEN_STAR) {
-            expr = new_binary(a, AST_MULTIPLY, expr, parse_unary);
+            e = new_binary(a, AST_MULTIPLY, e , parse_unary);
         } else if (a->token == TOKEN_SLASH) {
-            expr = new_binary(a, AST_DIVIDE, expr, parse_unary);
+            e = new_binary(a, AST_DIVIDE, e, parse_unary);
         } else if (a->token == TOKEN_PERCENT) {
-            expr = new_binary(a, AST_MODULO, expr, parse_unary);
+            e = new_binary(a, AST_MODULO, e, parse_unary);
         } else {
             break;
         }
     }
-    return expr;
+    return e;
 }
 
 static expression_t* parse_additive(ash_state_t* a) {
-    expression_t* expr = parse_multiplicative(a);
+    expression_t* e = parse_multiplicative(a);
     while (true) {
         if (a->token == TOKEN_PLUS) {
-            expr = new_binary(a, AST_ADD, expr, parse_multiplicative);
+            e = new_binary(a, AST_ADD, e, parse_multiplicative);
         } else if (a->token == TOKEN_MINUS) {
-            expr = new_binary(a, AST_SUBTRACT, expr, parse_multiplicative);
+            e = new_binary(a, AST_SUBTRACT, e, parse_multiplicative);
         } else {
             break;
         }
     }
-    return expr;
+    return e;
 }
 
 static expression_t* parse_shift(ash_state_t* a) {
@@ -244,27 +241,27 @@ static expression_t* parse_assignment(ash_state_t* a) {
     expression_t* e = parse_xor(a);
     while (true) {
         if (a->token == TOKEN_EQUAL) {
-            e = new_binary(a, AST_ASSIGN, e, parse_xor);
+            e = new_binary(a, AST_ASSIGN, e, parse_expression);
         } else if (a->token == TOKEN_PLUS_EQUAL) {
-            e = new_compound_assignment(a, AST_ADD, e, parse_xor);
+            e = new_compound_assignment(a, AST_ADD, e, parse_expression);
         } else if (a->token == TOKEN_MINUS_EQUAL) {
-            e = new_compound_assignment(a, AST_SUBTRACT, e, parse_xor);
+            e = new_compound_assignment(a, AST_SUBTRACT, e, parse_expression);
         } else if (a->token == TOKEN_STAR_EQUAL) {
-            e = new_compound_assignment(a, AST_MULTIPLY, e, parse_xor);
+            e = new_compound_assignment(a, AST_MULTIPLY, e, parse_expression);
         } else if (a->token == TOKEN_SLASH_EQUAL) {
-            e = new_compound_assignment(a, AST_DIVIDE, e, parse_xor);
+            e = new_compound_assignment(a, AST_DIVIDE, e, parse_expression);
         } else if (a->token == TOKEN_PERCENT_EQUAL) {
-            e = new_compound_assignment(a, AST_MODULO, e, parse_xor);
+            e = new_compound_assignment(a, AST_MODULO, e, parse_expression);
         } else if (a->token == TOKEN_AMPERSAND_EQUAL) {
-            e = new_compound_assignment(a, AST_BITWISE_AND, e, parse_xor);
+            e = new_compound_assignment(a, AST_BITWISE_AND, e, parse_expression);
         } else if (a->token == TOKEN_CARROT_EQUAL) {
-            e = new_compound_assignment(a, AST_BITWISE_XOR, e, parse_xor);
+            e = new_compound_assignment(a, AST_BITWISE_XOR, e, parse_expression);
         } else if (a->token == TOKEN_BAR_EQUAL) {
-            e = new_compound_assignment(a, AST_BITWISE_OR, e, parse_xor);
+            e = new_compound_assignment(a, AST_BITWISE_OR, e, parse_expression);
         } else if (a->token == TOKEN_LESS_LESS_EQUAL) {
-            e = new_compound_assignment(a, AST_SHIFT_LEFT, e, parse_xor);
+            e = new_compound_assignment(a, AST_SHIFT_LEFT, e, parse_expression);
         } else if (a->token == TOKEN_GREATER_GREATER_EQUAL) {
-            e = new_compound_assignment(a, AST_SHIFT_RIGHT, e, parse_xor);
+            e = new_compound_assignment(a, AST_SHIFT_RIGHT, e, parse_expression);
         } else {
             break;
         }

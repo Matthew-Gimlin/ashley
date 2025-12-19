@@ -6,9 +6,12 @@
 
 typedef enum {
     AST_ERROR = 0,
+    AST_BOOL,
+    AST_BYTE,
     AST_INT,
     AST_FLOAT,
     AST_IDENTIFIER,
+    AST_CONVERT,
     AST_CAST,
     AST_NEGATE,
     AST_ADD,
@@ -52,6 +55,8 @@ typedef struct statement_s statement_t;
 struct expression_s {
     ast_t ast;
     union {
+        ash_bool_t _bool;
+        ash_byte_t byte;
         ash_int_t _int;
         ash_float_t _float;
         struct { expression_t* right; } unary;

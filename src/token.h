@@ -7,6 +7,7 @@ typedef enum {
     TOKEN_NEWLINE,
     TOKEN_LEFT_PARENTHESIS,         // (
     TOKEN_RIGHT_PARENTHESIS,        // )
+    TOKEN_AS,                       // as
     TOKEN_PLUS,                     // +
     TOKEN_MINUS,                    // -
     TOKEN_STAR,                     // *

@@ -9,6 +9,14 @@
 #include <string.h>
 
 static void set_default_types(ash_state_t* a) {
+    type_t* bool_type = arena_alloc(a->arena, sizeof(type_t));
+    *bool_type = (type_t){TYPE_BOOL, sizeof(ash_bool_t), alignof(ash_bool_t)};
+    table_set(&a->types, "bool", 4, bool_type);
+
+    type_t* byte_type = arena_alloc(a->arena, sizeof(type_t));
+    *byte_type = (type_t){TYPE_BYTE, sizeof(ash_byte_t), alignof(ash_byte_t)};
+    table_set(&a->types, "byte", 4, byte_type);
+
     type_t* int_type = arena_alloc(a->arena, sizeof(type_t));
     *int_type = (type_t){TYPE_INT, sizeof(ash_int_t), alignof(ash_int_t)};
     table_set(&a->types, "int", 3, int_type);

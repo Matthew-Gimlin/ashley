@@ -2,8 +2,10 @@
 #include "state.h"
 #include "ast.h"
 #include "common.h"
-#include "debug.h"
 #include <stdbool.h>
+
+#include "debug.h"
+#include <stdio.h>
 
 static inline bool is_type(ast_t* ast, type_type_t type) {
     return ast->type != NULL && ast->type->type == type;
@@ -13,7 +15,7 @@ static inline bool is_number_type(ast_t* ast) {
     return is_type(ast, TYPE_INT) || is_type(ast, TYPE_FLOAT);
 }
 
-static expression_t* cast(ash_state_t* a, expression_t* e, type_t* type) {
+static expression_t* convert(ash_state_t* a, expression_t* e, type_t* type) {
     if (!e || e->ast.type == type) {
         return e;
     }
@@ -21,7 +23,7 @@ static expression_t* cast(ash_state_t* a, expression_t* e, type_t* type) {
     if (!c) {
         return NULL;
     }
-    c->ast.node = AST_CAST;
+    c->ast.node = AST_CONVERT;
     c->ast.type = type;
     c->ast.begin = e->ast.begin;
     c->ast.end = e->ast.end;
@@ -68,8 +70,8 @@ static int tag_ast(ash_state_t* a, ast_t* ast) {
                 return 1;
             }
             if (BINARY_LEFT(e)->ast.type != BINARY_RIGHT(e)->ast.type) {
-                BINARY_LEFT(e) = cast(a, BINARY_LEFT(e), float_type);
-                BINARY_RIGHT(e) = cast(a, BINARY_RIGHT(e), float_type);
+                BINARY_LEFT(e) = convert(a, BINARY_LEFT(e), float_type);
+                BINARY_RIGHT(e) = convert(a, BINARY_RIGHT(e), float_type);
             }
             ast->type = BINARY_LEFT(e)->ast.type;
             return 0;
@@ -149,7 +151,7 @@ static int fold_ast(ash_state_t* a, ast_t* ast) {
         case AST_ERROR:
             return 1;
 
-        case AST_CAST:
+        case AST_CONVERT:
             if (fold_ast(a, &UNARY_RIGHT(e)->ast) != 0) {
                 return 1;
             }
