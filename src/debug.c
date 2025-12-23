@@ -22,6 +22,11 @@ void dump_ast(ash_state_t* a, ast_t* ast) {
             break;
 
         case AST_CAST:
+            printf("(");
+            dump_ast(a, &BINARY_LEFT(e)->ast);
+            printf(" as ");
+            dump_ast(a, &BINARY_RIGHT(e)->ast);
+            printf(")");
             break;
 
         case AST_NEGATE:

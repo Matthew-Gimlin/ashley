@@ -186,7 +186,7 @@ static int lex_char(ash_state_t* a) {
 static bool is_keyword(ash_state_t* a, unsigned i, const char* keyword,
         size_t keyword_size) {
     return a->end - i == keyword_size &&
-        memcmp(&a->src[i], keyword, keyword_size);
+        memcmp(&a->src[i], keyword, keyword_size) == 0;
 }
 
 static token_t get_identifier_type(ash_state_t* a) {
@@ -234,6 +234,9 @@ static int lex_identifier(ash_state_t* a) {
 }
 
 int lex(ash_state_t* a) {
+    if (!a) {
+        return 1;
+    }
     skip_space(a);
     a->begin = a->end;
     switch (a->src[a->end]) {

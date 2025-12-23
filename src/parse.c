@@ -113,15 +113,27 @@ static expression_t* parse_unary(ash_state_t* a) {
     return parse_atom(a);
 }
 
-static expression_t* parse_multiplicative(ash_state_t* a) {
+static expression_t* parse_cast(ash_state_t* a) {
     expression_t* e = parse_unary(a);
-    while (true) {
+    while (e) {
+        if (a->token == TOKEN_AS) {
+            e = new_binary(a, AST_CAST, e, parse_unary);
+        } else {
+            break;
+        }
+    }
+    return e;
+}
+
+static expression_t* parse_multiplicative(ash_state_t* a) {
+    expression_t* e = parse_cast(a);
+    while (e) {
         if (a->token == TOKEN_STAR) {
-            e = new_binary(a, AST_MULTIPLY, e , parse_unary);
+            e = new_binary(a, AST_MULTIPLY, e , parse_cast);
         } else if (a->token == TOKEN_SLASH) {
-            e = new_binary(a, AST_DIVIDE, e, parse_unary);
+            e = new_binary(a, AST_DIVIDE, e, parse_cast);
         } else if (a->token == TOKEN_PERCENT) {
-            e = new_binary(a, AST_MODULO, e, parse_unary);
+            e = new_binary(a, AST_MODULO, e, parse_cast);
         } else {
             break;
         }
@@ -131,7 +143,7 @@ static expression_t* parse_multiplicative(ash_state_t* a) {
 
 static expression_t* parse_additive(ash_state_t* a) {
     expression_t* e = parse_multiplicative(a);
-    while (true) {
+    while (e) {
         if (a->token == TOKEN_PLUS) {
             e = new_binary(a, AST_ADD, e, parse_multiplicative);
         } else if (a->token == TOKEN_MINUS) {
@@ -145,7 +157,7 @@ static expression_t* parse_additive(ash_state_t* a) {
 
 static expression_t* parse_shift(ash_state_t* a) {
     expression_t* e = parse_additive(a);
-    while (true) {
+    while (e) {
         if (a->token == TOKEN_LESS_LESS) {
             e = new_binary(a, AST_SHIFT_LEFT, e, parse_additive);
         } else if (a->token == TOKEN_GREATER_GREATER) {
@@ -159,7 +171,7 @@ static expression_t* parse_shift(ash_state_t* a) {
 
 static expression_t* parse_comparison(ash_state_t* a) {
     expression_t* e = parse_shift(a);
-    while (true) {
+    while (e) {
         if (a->token == TOKEN_LESS) {
             e = new_binary(a, AST_LESS, e, parse_shift);
         } else if (a->token == TOKEN_LESS_EQUAL) {
@@ -177,7 +189,7 @@ static expression_t* parse_comparison(ash_state_t* a) {
 
 static expression_t* parse_equality(ash_state_t* a) {
     expression_t* e = parse_comparison(a);
-    while (true) {
+    while (e) {
         if (a->token == TOKEN_EQUAL_EQUAL) {
             e = new_binary(a, AST_EQUAL, e, parse_comparison);
         } else if (a->token == TOKEN_BANG_EQUAL) {
@@ -191,7 +203,7 @@ static expression_t* parse_equality(ash_state_t* a) {
 
 static expression_t* parse_bitwise_and(ash_state_t* a) {
     expression_t* e = parse_equality(a);
-    while (a->token == TOKEN_AMPERSAND) {
+    while (e && a->token == TOKEN_AMPERSAND) {
         e = new_binary(a, AST_BITWISE_AND, e, parse_equality);
     }
     return e;
@@ -199,7 +211,7 @@ static expression_t* parse_bitwise_and(ash_state_t* a) {
 
 static expression_t* parse_bitwise_or(ash_state_t* a) {
     expression_t* e = parse_bitwise_and(a);
-    while (a->token == TOKEN_BAR) {
+    while (e && a->token == TOKEN_BAR) {
         e = new_binary(a, AST_BITWISE_OR, e, parse_bitwise_and);
     }
     return e;
@@ -207,7 +219,7 @@ static expression_t* parse_bitwise_or(ash_state_t* a) {
 
 static expression_t* parse_bitwise_xor(ash_state_t* a) {
     expression_t* e = parse_bitwise_or(a);
-    while (a->token == TOKEN_CARROT) {
+    while (e && a->token == TOKEN_CARROT) {
         e = new_binary(a, AST_BITWISE_XOR, e, parse_bitwise_or);
     }
     return e;
@@ -239,7 +251,7 @@ static expression_t* parse_xor(ash_state_t* a) {
 
 static expression_t* parse_assignment(ash_state_t* a) {
     expression_t* e = parse_xor(a);
-    while (true) {
+    while (e) {
         if (a->token == TOKEN_EQUAL) {
             e = new_binary(a, AST_ASSIGN, e, parse_expression);
         } else if (a->token == TOKEN_PLUS_EQUAL) {
@@ -274,6 +286,9 @@ static expression_t* parse_expression(ash_state_t* a) {
 }
 
 int parse(ash_state_t* a) {
+    if (!a) {
+        return 1;
+    }
     a->ast = (ast_t*)parse_expression(a);
     return 0;
 }

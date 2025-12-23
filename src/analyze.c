@@ -36,10 +36,29 @@ static int tag_ast(ash_state_t* a, ast_t* ast) {
         return 1;
     }
     expression_t* e = (expression_t*)ast;
+    // type_t* int_type = table_get(&a->types, "int", 3);
     type_t* float_type = table_get(&a->types, "float", 5);
     switch (ast->node) {
         case AST_ERROR:
             return 1;
+
+        case AST_IDENTIFIER:
+            return 0;
+
+        case AST_CAST:
+            if (tag_ast(a, &BINARY_LEFT(e)->ast) != 0) {
+                return 1;
+            }
+            if (tag_ast(a, &BINARY_RIGHT(e)->ast) != 0) {
+                return 1;
+            }
+            ast->type = table_get(&a->types,
+                    &a->src[BINARY_RIGHT(e)->ast.begin],
+                    BINARY_RIGHT(e)->ast.end - BINARY_RIGHT(e)->ast.begin);
+            if (!ast->type) {
+                return 1;
+            }
+            return 0;
 
         case AST_NEGATE:
             if (tag_ast(a, &UNARY_RIGHT(e)->ast) != 0) {
@@ -151,6 +170,28 @@ static int fold_ast(ash_state_t* a, ast_t* ast) {
         case AST_ERROR:
             return 1;
 
+        case AST_CAST:
+            if (fold_ast(a, &BINARY_LEFT(e)->ast) != 0) {
+                return 1;
+            }
+            if (fold_ast(a, &BINARY_RIGHT(e)->ast) != 0) {
+                return 1;
+            }
+            if (ast->type == BINARY_LEFT(e)->ast.type) {
+                *e = *BINARY_LEFT(e);
+            } else if (ast->type->type == TYPE_INT &&
+                    BINARY_LEFT(e)->ast.node == AST_FLOAT) {
+                e->as._int = (ash_int_t)BINARY_LEFT(e)->as._float;
+                ast->node = AST_INT;
+            } else if (ast->type->type == TYPE_FLOAT &&
+                    BINARY_LEFT(e)->ast.node == AST_INT) {
+                e->as._float = (ash_int_t)BINARY_LEFT(e)->as._int;
+                ast->node = AST_FLOAT;
+            } else {
+                return 1;
+            }
+            return 0;
+
         case AST_CONVERT:
             if (fold_ast(a, &UNARY_RIGHT(e)->ast) != 0) {
                 return 1;
@@ -238,6 +279,9 @@ static int fold_ast(ash_state_t* a, ast_t* ast) {
 }
 
 int analyze(ash_state_t* a) {
+    if (!a) {
+        return 1;
+    }
     if (tag_ast(a, a->ast) != 0) {
         return 1;
     }
